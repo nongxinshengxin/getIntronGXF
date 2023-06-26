@@ -32,27 +32,21 @@ def find_intron(gxf,format,newgxf):
             end=int(lin[4])
             attribution=lin[8]
             if type=="exon" and format=="gff":
-                if ";" in attribution:
-                    trans_id=re.search(r"(?<=Parent=)(.+);",attribution).groups()
-                    exon_dic.setdefault(trans_id[0],[]).append(start-1)
-                    exon_dic.setdefault(trans_id[0],[]).append(end+1)
-                    info_dic.setdefault(trans_id[0],[]).append(lin)
-                else:
-                    trans_id=re.search(r"(?<=Parent=).+",attribution).group()
-                    exon_dic.setdefault(trans_id,[]).append(start-1)
-                    exon_dic.setdefault(trans_id,[]).append(end+1)
-                    info_dic.setdefault(trans_id,[]).append(lin)
+                attri_list=attribution.split(";")
+                for i in attri_list:
+                    if re.search(r"Parent=",i):
+                        trans_id=re.search(r"(?<=Parent=).+",i).group()
+                        exon_dic.setdefault(trans_id,[]).append(start-1)
+                        exon_dic.setdefault(trans_id,[]).append(end+1)
+                        info_dic.setdefault(trans_id,[]).append(lin)
             if type=="exon" and format=="gtf":
-                if ";" in attribution:
-                    trans_id=re.search(r"(?<=transcript_id )(.+);",attribution).groups()
-                    exon_dic.setdefault(trans_id[0],[]).append(start-1)
-                    exon_dic.setdefault(trans_id[0],[]).append(end+1)
-                    info_dic.setdefault(trans_id[0],[]).append(lin)
-                else:
-                    trans_id=re.search(r"(?<=transcript_id ).+",attribution).group()
-                    exon_dic.setdefault(trans_id,[]).append(start-1)
-                    exon_dic.setdefault(trans_id,[]).append(end+1)
-                    info_dic.setdefault(trans_id,[]).append(lin)
+                attri_list=attribution.split(";")
+                for i in attri_list:
+                    if re.search(r"transcript_id",i):
+                        trans_id=re.search(r"(?<=transcript_id ).+",i).group()
+                        exon_dic.setdefault(trans_id,[]).append(start-1)
+                        exon_dic.setdefault(trans_id,[]).append(end+1)
+                        info_dic.setdefault(trans_id,[]).append(lin)
     with open(newgxf,"w") as w:
     
         for key in exon_dic.keys():
